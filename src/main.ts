@@ -9,6 +9,8 @@ import store from './store';
 
 import router from './router';
 
+import registerInterceptors from './interceptors';
+
 import App from './App.vue';
 
 router.beforeEach((to, from, next) => {
@@ -16,6 +18,8 @@ router.beforeEach((to, from, next) => {
     next({ path: '/authorization/login' });
   } else next();
 });
+
+registerInterceptors();
 
 createApp(App)
   .use(ElementPlus)

@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
-import Home from '../views/Home.vue';
 import AuthorizationLayout from '@/pages/Layout/AuthorizationLayout.vue';
+import ContentLayout from '@/pages/Layout/ContentLayout.vue';
 import LoginComponent from '@/pages/Authorization/LoginComponent.vue';
 import ResetPasswordComponent from '@/pages/Authorization/ResetPasswordComponent.vue';
 
@@ -34,8 +34,8 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/',
-    name: 'Home',
-    component: Home,
+    name: 'ContentLayout',
+    component: ContentLayout,
   },
   {
     path: '/about',
