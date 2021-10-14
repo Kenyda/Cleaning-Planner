@@ -1,11 +1,13 @@
 <template>
-$END$
+<div></div>
 </template>
 
-<script>
-export default {
-name: "ResetPasswordComponent"
-}
+<script lang="ts">
+import { defineComponent } from 'vue';
+
+export default defineComponent({
+  name: 'ResetPasswordComponent',
+});
 </script>
 
 <style scoped>

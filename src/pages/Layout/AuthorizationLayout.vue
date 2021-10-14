@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Auth</h1>
+    <h1 style="color: white">Auth</h1>
     <router-view></router-view>
   </div>
 </template>

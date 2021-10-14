@@ -1,0 +1,12 @@
+@import "./variables";
+
+.body-wrapper {
+  background-color: rgba(0, 7, 16, 0.9);
+}
+
+.authorization-card {
+  width: 50vw;
+  min-width: 300px;
+  max-width: 600px;
+  margin: 0 auto;
+}

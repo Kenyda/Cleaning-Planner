@@ -1,7 +1,37 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import Home from '../views/Home.vue';
+import AuthorizationLayout from '@/pages/Layout/AuthorizationLayout.vue';
+import LoginComponent from '@/pages/Authorization/LoginComponent.vue';
+import ResetPasswordComponent from '@/pages/Authorization/ResetPasswordComponent.vue';
 
 const routes: Array<RouteRecordRaw> = [
+  {
+    path: '/authorization',
+    redirect: '/authorization/login',
+    component: AuthorizationLayout,
+    meta: {
+      guest: true,
+    },
+    children: [
+      {
+        path: 'login',
+        name: 'Login',
+        component: LoginComponent,
+        meta: {
+          guest: true,
+        },
+      },
+      {
+        path: 'reset_password',
+        name: 'Reset Password',
+        component: ResetPasswordComponent,
+        meta: {
+          guest: true,
+          no_need_profile: true,
+        },
+      },
+    ],
+  },
   {
     path: '/',
     name: 'Home',
