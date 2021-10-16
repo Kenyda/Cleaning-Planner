@@ -4,8 +4,8 @@ $END$
 
 <script>
 export default {
-name: "CreateComponent"
-}
+  name: 'CreateComponent',
+};
 </script>
 
 <style scoped>

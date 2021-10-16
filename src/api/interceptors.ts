@@ -1,7 +1,7 @@
 import fetchIntercept from 'fetch-intercept';
 
-import store from './store';
-import router from './router';
+import store from '@/store';
+import router from '@/router';
 
 export default function registerInterceptors() {
   fetchIntercept.register({
