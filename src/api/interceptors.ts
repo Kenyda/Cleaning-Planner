@@ -1,7 +1,7 @@
 import fetchIntercept from 'fetch-intercept';
 
-import store from './store';
-import router from './router';
+import store from '@/store';
+import router from '@/router';
 
 export default function registerInterceptors() {
   fetchIntercept.register({
@@ -17,8 +17,8 @@ export default function registerInterceptors() {
 
     response(response) {
       if (response.status === 401) {
-        store.dispatch('saveToken', null);
-        localStorage.setItem('token', JSON.stringify(null));
+        store.dispatch('logout');
+
         router.push('/');
       }
       // Modify the reponse object
