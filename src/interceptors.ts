@@ -20,8 +20,8 @@ export default function registerInterceptors() {
     response(response) {
       console.log(response);
       if (response.status === 401) {
-        store.dispatch('saveToken', null);
-        localStorage.setItem('token', JSON.stringify(null));
+        store.dispatch('logout');
+
         router.push('/');
       }
       // Modify the reponse object

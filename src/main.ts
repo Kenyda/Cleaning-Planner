@@ -16,7 +16,8 @@ import App from './App.vue';
 router.beforeEach((to, from, next) => {
   if (to.name !== 'Login' && !store.getters.isAuthenticated) {
     next({ path: '/authorization/login' });
-  } else next();
+  }
+  next();
 });
 
 registerInterceptors();
