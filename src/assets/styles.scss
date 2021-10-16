@@ -10,3 +10,16 @@
   max-width: 600px;
   margin: 15vh auto;
 }
+
+.add-card {
+  cursor: pointer;
+  color: #727070;
+  font-size: 23px;
+  :hover {
+    color: rgba(121, 152, 185, 0.9);
+  }
+}
+
+.create-card {
+  margin: 20px;
+}

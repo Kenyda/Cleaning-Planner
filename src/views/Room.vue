@@ -1,11 +1,13 @@
 <template>
-$END$
+<div>uudfu</div>
 </template>
 
-<script>
-export default {
-name: "Room"
-}
+<script lang="ts">
+import { defineComponent } from 'vue';
+
+export default defineComponent({
+  name: 'Room',
+});
 </script>
 
 <style scoped>

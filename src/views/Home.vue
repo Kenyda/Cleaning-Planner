@@ -1,6 +1,13 @@
 <template>
   <el-card>
     <h1>Моя хата</h1>
+    <el-row>
+      <el-col :span="6">
+        <add-room  shadow="hover"
+                   :title="'Добавить комнату'"
+                   :routerPath="'/room/create'"></add-room>
+      </el-col>
+    </el-row>
   </el-card>
 </template>
 
@@ -8,12 +15,18 @@
 import { defineComponent } from 'vue';
 import {
   ElCard,
+  ElRow,
+  ElCol,
 } from 'element-plus';
+import AddComponent from '@/components/AddComponent.vue';
 
 export default defineComponent({
   name: 'Home',
   components: {
     ElCard,
+    ElRow,
+    ElCol,
+    AddRoom: AddComponent,
   },
 
   data() {
