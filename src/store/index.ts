@@ -4,7 +4,7 @@ const TOKEN_KEY = 'TOKEN';
 
 export default createStore({
   state: {
-    token: localStorage.getItem(TOKEN_KEY) as string | null,
+    token: localStorage.getItem(TOKEN_KEY),
   },
   mutations: {
     updateToken(state, payload: string) {

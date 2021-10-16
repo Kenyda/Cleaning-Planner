@@ -12,6 +12,9 @@
     "allowSyntheticDefaultImports": true,
     "sourceMap": true,
     "baseUrl": ".",
+    "typeRoots": [
+      "src/shims",
+    ],
     "types": [
       "webpack-env",
       "mocha",
