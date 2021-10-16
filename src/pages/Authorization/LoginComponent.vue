@@ -106,8 +106,7 @@ export default defineComponent({
       if (isValid) {
         const tokenData = await this.getToken();
         if (tokenData.access_token) {
-          this.$store.dispatch('saveToken', tokenData.access_token);
-          localStorage.setItem('token', JSON.stringify(tokenData.access_token));
+          this.$store.dispatch('login', tokenData.access_token);
           this.$router.push('/');
         } else this.authError = true;
       }
@@ -131,15 +130,6 @@ export default defineComponent({
       }
     },
   },
-
-  mounted() {
-    const localStorageToken = JSON.parse(localStorage.getItem('token') as string);
-    if (localStorageToken) {
-      this.$store.dispatch('saveToken', localStorageToken);
-      this.$router.push('/');
-    }
-  },
-
 });
 </script>
 
