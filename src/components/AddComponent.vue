@@ -1,5 +1,7 @@
 <template>
-  <el-card class="add-card" @click="goToRoute">
+  <el-card class="add-card"
+           shadow="hover"
+           @click="goToRoute">
     <el-icon :size="40">
       <plus/>
     </el-icon>
@@ -27,14 +29,11 @@ export default defineComponent({
       type: String,
       required: true,
     },
-    routerPath: {
-      type: String,
-      required: true,
-    },
+    routerPath: String,
   },
   methods: {
     goToRoute() {
-      this.$router.push(this.$props.routerPath);
+      if (this.$props.routerPath) this.$router.push(this.$props.routerPath);
     },
   },
 });

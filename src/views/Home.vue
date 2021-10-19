@@ -1,5 +1,5 @@
 <template>
-  <el-card>
+  <el-card v-if="apartmentsData.items.length > 0">
     <h1>Моя хата</h1>
     <el-row>
       <el-col :span="6">
@@ -31,7 +31,12 @@ export default defineComponent({
 
   data() {
     return {
-      apartmentsData: [],
+      apartmentsData: {
+        items: [],
+        limit: 0,
+        offset: 0,
+        total: 0,
+      },
     };
   },
 
@@ -49,6 +54,10 @@ export default defineComponent({
         if (response.status === 401) {
           console.log('error');
         } else this.apartmentsData = await response.json();
+        if (this.apartmentsData.items.length === 0) {
+          console.log('push');
+          this.$router.push('/apartment/create');
+        }
       } catch (err) {
         console.log(err);
       }
