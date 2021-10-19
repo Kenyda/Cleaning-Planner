@@ -17,14 +17,16 @@
     <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4"
             v-for="task in roomData.tasks" :key="task.id">
       <task :taskData="task"
-            :color="form.color"></task>
+            :color="form.color"
+            @edit-task="openEditForm"></task>
     </el-col>
     <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4">
-      <add-component title="Добавить задачу" @click="taskFormVisible = true"></add-component>
+      <add-component title="Добавить задачу" @click="openAddForm"></add-component>
     </el-col>
   </el-row>
-  <el-dialog v-model="taskFormVisible" title="title">
-    <task-form></task-form>
+  <el-dialog v-model="taskFormVisible" :title="dialogTitle">
+    <task-form :formData="currentTask"
+               @task-created="createTask"></task-form>
   </el-dialog>
 </template>
 
@@ -70,8 +72,44 @@ export default defineComponent({
         color: '',
       },
       taskFormVisible: false,
+      currentTask: {
+        name: '',
+        description: '',
+        id: 0,
+      },
+      idForCreate: 1,
+      dialogTitle: '',
     };
   },
+
+  methods: {
+    openEditForm(id: number) {
+      console.log(id);
+      this.dialogTitle = 'Редактирование задачи';
+      this.currentTask = {
+        ...this.roomData.tasks
+          .filter((item: { name: string, description: string, id: number }) => item.id === id)[0],
+      };
+      console.log(this.currentTask);
+      this.taskFormVisible = true;
+    },
+    openAddForm() {
+      this.dialogTitle = 'Добавление задачи';
+      this.currentTask = {
+        name: '',
+        description: '',
+        id: this.idForCreate,
+      };
+      console.log(this.currentTask);
+      this.taskFormVisible = true;
+    },
+    createTask(data: { name: string, description: string, id: number}) {
+      this.taskFormVisible = false;
+      this.$emit('taskCreated', data, this.roomData.id);
+      this.idForCreate += 1;
+    },
+  },
+
   mounted() {
     if (this.roomData) {
       this.form.name = this.roomData.name;

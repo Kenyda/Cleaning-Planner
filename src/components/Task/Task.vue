@@ -6,7 +6,7 @@
       <delete />
     </el-icon>
     <el-icon class="icon edit">
-      <edit />
+      <edit @click="$emit('editTask', taskData.id)" />
     </el-icon>
   </template>
   <template v-if="taskData.description !== ''">
