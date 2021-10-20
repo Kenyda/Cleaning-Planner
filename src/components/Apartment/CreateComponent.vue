@@ -6,7 +6,7 @@
      </el-form-item>
    </el-form>
    <el-card v-for="room in rooms" :key="room.id" style="margin-bottom: 15px">
-    <create-room :roomData="room" @task-created="addTask"></create-room>
+    <create-room :roomData="room" @task-create="addTask"></create-room>
    </el-card>
  </el-card>
 </template>
@@ -76,14 +76,7 @@ export default defineComponent({
   methods: {
     addTask(data: { name: string, description: string, id: number}, id: number) {
       this.rooms.filter((room) => room.id === id)[0].tasks.push(data);
-      console.log('data');
-      console.log(data);
-      console.log(id);
     },
   },
 });
 </script>
-
-<style scoped>
-
-</style>

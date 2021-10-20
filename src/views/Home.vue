@@ -55,7 +55,6 @@ export default defineComponent({
           console.log('error');
         } else this.apartmentsData = await response.json();
         if (this.apartmentsData.items.length === 0) {
-          console.log('push');
           this.$router.push('/apartment/create');
         }
       } catch (err) {

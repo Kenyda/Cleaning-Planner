@@ -39,6 +39,8 @@ export default defineComponent({
     formData: Object,
   },
 
+  emits: ['taskCreated'],
+
   setup() {
     const formRef = ref<InstanceType<typeof ElForm>>();
 
@@ -53,21 +55,35 @@ export default defineComponent({
       },
       rules: {
         name: [
-          { required: true, message: '', trigger: ['change', 'blur'] },
-          { max: 32, message: '', trigger: ['change', 'blur'] },
+          { required: true, message: 'Поле обязательно для заполнения', trigger: ['change', 'blur'] },
+          { max: 32, message: 'Значение не должно быть длиннее 32 символов', trigger: ['change', 'blur'] },
+        ],
+        description: [
+          { max: 128, message: 'Значение не должно быть длиннее 128 символов', trigger: ['change', 'blur'] },
         ],
       },
       id: 0,
     };
   },
 
+  computed: {
+    formDataRef(): InstanceType<typeof ElForm> {
+      if (!this.formRef) throw new Error('No form ref!');
+
+      return this.formRef;
+    },
+  },
+
   mounted() {
     if (this.formData) {
-      console.log('fdata');
       this.form.name = this.formData.name;
       this.form.description = this.formData.description;
       this.id = this.formData.id;
     }
+  },
+
+  updated() {
+    this.formDataRef.clearValidate();
   },
 
   watch: {
@@ -82,25 +98,17 @@ export default defineComponent({
 
   methods: {
     saveData() {
-      if (this.formRef) {
-        this.formRef.validate((valid: boolean | undefined) => {
-          if (valid) {
-            if (this.formData) {
-              const taskData = {
-                name: this.form.name,
-                description: this.form.description,
-                id: this.formData.id,
-              };
-              this.$emit('task-created', taskData);
-            }
-          }
-        });
-      }
+      this.formDataRef.validate((valid: boolean | undefined) => {
+        if (valid && this.formData) {
+          const taskData = {
+            name: this.form.name,
+            description: this.form.description,
+            id: this.formData.id,
+          };
+          this.$emit('taskCreated', taskData);
+        }
+      });
     },
   },
 });
 </script>
-
-<style scoped>
-
-</style>

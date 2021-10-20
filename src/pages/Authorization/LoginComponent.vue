@@ -89,7 +89,7 @@ export default defineComponent({
           },
           {
             max: 128,
-            message: 'Значение не должно быть длиннее 128',
+            message: 'Значение не должно быть длиннее 128 символов',
             trigger: ['change', 'blur'],
           },
         ],

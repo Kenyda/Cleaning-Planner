@@ -65,6 +65,7 @@ export default defineComponent({
       required: true,
     },
   },
+  emits: ['taskCreate'],
   data() {
     return {
       form: {
@@ -84,13 +85,11 @@ export default defineComponent({
 
   methods: {
     openEditForm(id: number) {
-      console.log(id);
       this.dialogTitle = 'Редактирование задачи';
       this.currentTask = {
         ...this.roomData.tasks
           .filter((item: { name: string, description: string, id: number }) => item.id === id)[0],
       };
-      console.log(this.currentTask);
       this.taskFormVisible = true;
     },
     openAddForm() {
@@ -100,12 +99,11 @@ export default defineComponent({
         description: '',
         id: this.idForCreate,
       };
-      console.log(this.currentTask);
       this.taskFormVisible = true;
     },
     createTask(data: { name: string, description: string, id: number}) {
       this.taskFormVisible = false;
-      this.$emit('taskCreated', data, this.roomData.id);
+      this.$emit('taskCreate', data, this.roomData.id);
       this.idForCreate += 1;
     },
   },
