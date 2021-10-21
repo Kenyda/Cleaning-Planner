@@ -3,7 +3,7 @@
   <template #header>
     <span>{{ taskData.name }}</span>
     <el-icon class="icon delete">
-      <delete />
+      <delete @click="$emit('deleteTask', taskData.id)" />
     </el-icon>
     <el-icon class="icon edit">
       <edit @click="$emit('editTask', taskData.id)" />
@@ -44,6 +44,7 @@ export default defineComponent({
     },
     color: String,
   },
+  emits: ['deleteTask', 'editTask'],
   computed: {
     headerColor() {
       return `border-color: ${this.color}`;

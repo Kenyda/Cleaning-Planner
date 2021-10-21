@@ -18,6 +18,7 @@
             v-for="task in roomData.tasks" :key="task.id">
       <task :taskData="task"
             :color="form.color"
+            @delete-task="$emit('deleteTask', { taskId: $event, roomId: roomData.id })"
             @edit-task="openEditForm"></task>
     </el-col>
     <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4">
@@ -26,7 +27,7 @@
   </el-row>
   <el-dialog v-model="taskFormVisible" :title="dialogTitle">
     <task-form :formData="currentTask"
-               @task-created="createTask"></task-form>
+               @task-data-updated="updateTaskData"></task-form>
   </el-dialog>
 </template>
 
@@ -65,7 +66,7 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: ['taskCreate'],
+  emits: ['taskDataUpdate', 'deleteTask'],
   data() {
     return {
       form: {
@@ -101,9 +102,9 @@ export default defineComponent({
       };
       this.taskFormVisible = true;
     },
-    createTask(data: { name: string, description: string, id: number}) {
+    updateTaskData(data: { name: string, description: string, id: number}) {
       this.taskFormVisible = false;
-      this.$emit('taskCreate', data, this.roomData.id);
+      this.$emit('taskDataUpdate', data, this.roomData.id);
       this.idForCreate += 1;
     },
   },

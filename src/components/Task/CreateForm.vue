@@ -39,7 +39,7 @@ export default defineComponent({
     formData: Object,
   },
 
-  emits: ['taskCreated'],
+  emits: ['taskDataUpdated'],
 
   setup() {
     const formRef = ref<InstanceType<typeof ElForm>>();
@@ -105,7 +105,7 @@ export default defineComponent({
             description: this.form.description,
             id: this.formData.id,
           };
-          this.$emit('taskCreated', taskData);
+          this.$emit('taskDataUpdated', taskData);
         }
       });
     },
