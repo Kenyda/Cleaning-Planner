@@ -1,13 +1,15 @@
 <template>
-  <el-form v-model="form" label-position="top">
+  <el-form ref="formRef" :model="form" :rules="rules" label-position="top">
     <el-row :gutter="8">
       <el-col :span="22">
-        <el-form-item label="Название">
+        <el-form-item label="Название"
+                      prop="name">
           <el-input v-model="form.name"></el-input>
         </el-form-item>
       </el-col>
       <el-col :span="2">
-        <el-form-item label="Цвет">
+        <el-form-item label="Цвет"
+                      prop="color">
           <el-color-picker style="float: left" v-model="form.color"></el-color-picker>
         </el-form-item>
       </el-col>
@@ -32,7 +34,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, ref } from 'vue';
 import {
   ElRow,
   ElCol,
@@ -66,12 +68,25 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: ['taskDataUpdate', 'deleteTask'],
+  emits: ['taskDataUpdate', 'deleteTask', 'roomCreated'],
+
+  setup() {
+    const formRef = ref<InstanceType<typeof ElForm>>();
+
+    return { formRef };
+  },
+
   data() {
     return {
       form: {
         name: '',
         color: '',
+      },
+      rules: {
+        name: [
+          { required: true, message: 'Поле обязательно для заполнения', trigger: ['blur', 'change'] },
+          { max: 32, message: 'Значение не должно быть длиннее 32 символов', trigger: 'change' },
+        ],
       },
       taskFormVisible: false,
       currentTask: {
@@ -106,6 +121,30 @@ export default defineComponent({
       this.taskFormVisible = false;
       this.$emit('taskDataUpdate', data, this.roomData.id);
       this.idForCreate += 1;
+    },
+    createRoom() {
+      this.formDataRef.validate((valid: boolean | undefined) => {
+        if (valid) {
+          const roomData = {
+            name: this.form.name,
+            color: this.form.color,
+            id: this.roomData.id,
+          };
+          this.$emit('roomCreated', roomData);
+          this.formDataRef.resetFields();
+          this.$nextTick(() => {
+            this.formDataRef.clearValidate();
+          });
+        }
+      });
+    },
+  },
+
+  computed: {
+    formDataRef(): InstanceType<typeof ElForm> {
+      if (!this.formRef) throw new Error('No form ref!');
+
+      return this.formRef;
     },
   },
 
