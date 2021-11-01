@@ -12,6 +12,14 @@
       placeholder="Описание задачи"
     />
   </el-form-item>
+  <el-form-item label="Сложность">
+    <div class="slider-demo-block">
+      <el-slider v-model="points"
+                 :step="1"
+                 :max="10"
+                 show-stops> </el-slider>
+    </div>
+  </el-form-item>
   <el-form-item>
     <el-button @click="saveData">Сохранить</el-button>
   </el-form-item>
@@ -25,6 +33,7 @@ import {
   ElFormItem,
   ElInput,
   ElButton,
+  ElSlider,
 } from 'element-plus';
 
 export default defineComponent({
@@ -34,6 +43,7 @@ export default defineComponent({
     ElFormItem,
     ElInput,
     ElButton,
+    ElSlider,
   },
   props: {
     formData: Object,
@@ -43,8 +53,9 @@ export default defineComponent({
 
   setup() {
     const formRef = ref<InstanceType<typeof ElForm>>();
+    const points = ref(0);
 
-    return { formRef };
+    return { formRef, points };
   },
 
   data() {
@@ -104,6 +115,7 @@ export default defineComponent({
             name: this.form.name,
             description: this.form.description,
             id: this.formData.id,
+            points: this.points,
           };
           this.$emit('taskDataUpdated', taskData);
         }

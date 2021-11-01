@@ -93,6 +93,7 @@ export default defineComponent({
         name: '',
         description: '',
         id: 0,
+        points: 0,
       },
       idForCreate: 1,
       dialogTitle: '',
@@ -113,6 +114,7 @@ export default defineComponent({
       this.currentTask = {
         name: '',
         description: '',
+        points: 0,
         id: this.idForCreate,
       };
       this.taskFormVisible = true;

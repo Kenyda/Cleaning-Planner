@@ -119,7 +119,7 @@ export default defineComponent({
       formData.append('password', this.form.password);
 
       try {
-        const response = await fetch('http://localhost:8081/api/auth/jwt/login', {
+        const response = await fetch('/api/auth/jwt/login', {
           method: 'POST',
           body: formData,
         });
