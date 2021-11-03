@@ -103,6 +103,7 @@ export default defineComponent({
         this.form.name = val.name;
         this.form.description = val.description;
         this.id = val.id;
+        this.points = val.points;
       },
     },
   },

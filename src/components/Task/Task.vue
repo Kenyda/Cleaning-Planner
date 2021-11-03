@@ -1,9 +1,9 @@
 <template>
 <el-card shadow="hover" class="task-card">
   <template #header>
-    <span class="description">Сложность: {{taskData.points}}</span>
-    <br>
-    <hr :style="headerColor" class="task-color-mark" />
+    <div :style="headerColor" class="task-color-mark">
+      <span :style="pointColor" class="point-shadow">{{taskData.points}}</span>
+    </div>
     <span>{{ taskData.name }}</span>
     <el-icon class="icon delete">
       <delete @click="$emit('deleteTask', taskData.id)" />
@@ -50,7 +50,13 @@ export default defineComponent({
   emits: ['deleteTask', 'editTask'],
   computed: {
     headerColor() {
-      return `color: ${this.color}; background-color: ${this.color}`;
+      return `background-color: ${this.color}`;
+    },
+    pointColor() {
+      if (this.color) {
+        return parseInt(this.color.slice(1), 16) > 0xAAAAAA
+          ? 'color: #000000' : 'color: #FFFFFF';
+      } return '';
     },
   },
 });
@@ -64,15 +70,18 @@ export default defineComponent({
 .task-color-mark {
   height: 15px;
   width: 20px;
-  margin: 0;
+  margin: -3px 0;
   float: left;
-  border: none;
+  border: 1px solid #eae8e8;
   border-radius: 100%;
-  color: rgba(0, 7, 16, 0.9);
+  padding-bottom: 3px;
 }
-.description {
+.point-shadow {
   font-size: small;
-  color: #939292;
-  float: left;
+  background: inherit;
+  -webkit-background-clip: text;
+  color: transparent;
+  filter: invert(0) grayscale(1);
+  -webkit-filter: invert(0) grayscale(1);
 }
 </style>
