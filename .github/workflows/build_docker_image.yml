@@ -39,3 +39,9 @@ jobs:
           tags: ghcr.io/${{ env.IMAGE }}:latest
           context: .
           file: ./build_configs/build.dockerfile
+
+      - 
+        name: Invoke deployment hook
+        uses: jasongitmail/fast-webhook@v1
+        env:
+          url: ${{ secrets.WEBHOOK_URL }}
