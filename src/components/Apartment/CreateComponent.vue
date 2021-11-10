@@ -196,6 +196,7 @@ export default defineComponent({
               await this.createTask(task, roomData.id, apartmentData.id);
             });
           });
+          this.$router.push('/');
         }
       });
     },

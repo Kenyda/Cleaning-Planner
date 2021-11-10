@@ -1,12 +1,11 @@
 <template>
-  <el-card>
+  <el-card class="room-card">
     <template #header>
       <div class="card-header">
         <span><hr class="mark" :style="headerBackground">{{ data.name }}</span>
         <i class="el-icon-edit icon edit"></i>
       </div>
     </template>
-    dsd
   </el-card>
 </template>
 
@@ -37,6 +36,9 @@ export default defineComponent({
 </script>
 
 <style scoped>
+.room-card {
+  height: 200px;
+}
 .card-header {
   display: flex;
   justify-content: space-between;

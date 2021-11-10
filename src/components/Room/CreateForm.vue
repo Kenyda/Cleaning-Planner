@@ -16,13 +16,15 @@
     </el-row>
   </el-form>
   <el-row :gutter="10">
-    <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4"
-            v-for="task in roomData.tasks" :key="task.id">
-      <task :taskData="task"
-            :color="form.color"
-            @delete-task="$emit('deleteTask', { taskId: $event, roomId: roomData.id })"
-            @edit-task="openEditForm"></task>
-    </el-col>
+    <template v-if="roomData">
+      <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4"
+              v-for="task in roomData.tasks" :key="task.id">
+        <task :taskData="task"
+              :color="form.color"
+              @delete-task="$emit('deleteTask', { taskId: $event, roomId: roomData.id })"
+              @edit-task="openEditForm"></task>
+      </el-col>
+    </template>
     <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4">
       <add-component title="Добавить задачу" @click="openAddForm"></add-component>
     </el-col>
