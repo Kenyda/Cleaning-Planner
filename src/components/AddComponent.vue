@@ -30,10 +30,16 @@ export default defineComponent({
       required: true,
     },
     routerPath: String,
+    apartment: Number,
   },
   methods: {
     goToRoute() {
-      if (this.$props.routerPath) this.$router.push(this.$props.routerPath);
+      if (this.$props.routerPath) {
+        this.$router.push({
+          path: this.routerPath,
+          query: { apartmentId: this.apartment },
+        });
+      }
     },
   },
 });

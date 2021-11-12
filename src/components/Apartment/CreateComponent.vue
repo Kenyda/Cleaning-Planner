@@ -15,9 +15,7 @@
        </el-icon>
      </template>
     <create-room :roomData="room"
-                 :ref="setRoomRefs"
-                 @task-data-update="updateTaskData"
-                 @delete-task="deleteTask"></create-room>
+                 :ref="setRoomRefs"></create-room>
    </el-card>
    <el-button icon="el-icon-plus" @click="updateRoomData">Добавить комнату</el-button>
    <el-button @click="saveData">Сохранить</el-button>
@@ -126,27 +124,7 @@ export default defineComponent({
 
   methods: {
     setRoomRefs(el: InstanceType<typeof CreateForm>) {
-      if (el) {
-        this.roomRefs.push(el);
-      }
-    },
-
-    updateTaskData(data: { name: string, description: string, points: number, id: number},
-      roomId: number) {
-      const currentRoom = this.rooms.filter((room) => room.id === roomId)[0];
-      const currentTask = currentRoom.tasks.filter((task) => task.id === data.id)[0];
-      const roomIndex = this.rooms.indexOf(currentRoom);
-      const taskIndex = this.rooms[roomIndex].tasks.indexOf(currentTask);
-      if (taskIndex !== -1) {
-        this.rooms[roomIndex].tasks[taskIndex] = data;
-      } else currentRoom.tasks.push(data);
-    },
-
-    deleteTask(data: {taskId: number, roomId: number}) {
-      const currentRoom = this.rooms.filter((room) => room.id === data.roomId)[0];
-      const roomIndex = this.rooms.indexOf(currentRoom);
-      this.rooms[roomIndex].tasks = this.rooms[roomIndex].tasks
-        .filter((task) => task.id !== data.taskId);
+      if (el && !this.roomRefs.includes(el)) this.roomRefs.push(el);
     },
 
     updateRoomData() {
@@ -163,6 +141,7 @@ export default defineComponent({
       const currentRoom = this.rooms.filter((room) => room.id === id)[0];
       const roomIndex = this.rooms.indexOf(currentRoom);
       this.rooms.splice(roomIndex, 1);
+      this.roomRefs = [];
     },
 
     checkRoomData() {
@@ -190,11 +169,13 @@ export default defineComponent({
         if (!valid) this.formDataRef.scrollToField('name');
         else if (roomDataValid) {
           const apartmentData = await this.createApartment();
-          this.rooms.forEach(async (room) => {
-            const roomData = await this.createRoom(room, apartmentData.id);
-            room.tasks.forEach(async (task) => {
-              await this.createTask(task, roomData.id, apartmentData.id);
-            });
+          this.roomRefs.forEach(async (room) => {
+            if (room.form.name) {
+              const roomData = await this.createRoom(room.form, apartmentData.id);
+              room.tasks.forEach(async (task) => {
+                await this.createTask(task, roomData.id, apartmentData.id);
+              });
+            }
           });
           this.$router.push('/');
         }
@@ -240,12 +221,13 @@ export default defineComponent({
       }
     },
 
-    async createTask(taskData: { name: string, description: string },
+    async createTask(taskData: { name: string, description: string, points: number },
       roomId: number,
       apartmentId: number) {
       const data = {
         name: taskData.name,
         description: taskData.description,
+        points: taskData.points,
         rooms: [roomId],
         apartment: apartmentId,
       };

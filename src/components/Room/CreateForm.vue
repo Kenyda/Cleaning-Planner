@@ -16,12 +16,12 @@
     </el-row>
   </el-form>
   <el-row :gutter="10">
-    <template v-if="roomData">
+    <template v-if="tasks">
       <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4"
-              v-for="task in roomData.tasks" :key="task.id">
+              v-for="task in tasks" :key="task.id">
         <task :taskData="task"
               :color="form.color"
-              @delete-task="$emit('deleteTask', { taskId: $event, roomId: roomData.id })"
+              @delete-task="deleteTask"
               @edit-task="openEditForm"></task>
       </el-col>
     </template>
@@ -33,10 +33,11 @@
     <task-form :formData="currentTask"
                @task-data-updated="updateTaskData"></task-form>
   </el-dialog>
+  <el-button @click="$emit('createRoom')">+</el-button>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent, ref, reactive } from 'vue';
 import {
   ElRow,
   ElCol,
@@ -45,10 +46,18 @@ import {
   ElInput,
   ElColorPicker,
   ElDialog,
+  ElButton,
 } from 'element-plus';
 import Task from '@/components/Task/Task.vue';
 import CreateForm from '@/components/Task/CreateForm.vue';
 import AddComponent from '@/components/AddComponent.vue';
+
+interface ITask {
+  id: number,
+  name: string,
+  description: string,
+  points: number,
+}
 
 export default defineComponent({
   name: 'RoomCreateForm',
@@ -60,6 +69,7 @@ export default defineComponent({
     ElInput,
     ElColorPicker,
     ElDialog,
+    ElButton,
     Task,
     TaskForm: CreateForm,
     AddComponent,
@@ -70,12 +80,14 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: ['taskDataUpdate', 'deleteTask', 'roomCreated'],
+  emits: ['taskDataUpdate', 'deleteTask', 'roomCreated', 'createRoom'],
 
   setup() {
     const formRef = ref<InstanceType<typeof ElForm>>();
 
-    return { formRef };
+    const tasks = reactive([] as ITask[]);
+
+    return { formRef, tasks };
   },
 
   data() {
@@ -106,8 +118,7 @@ export default defineComponent({
     openEditForm(id: number) {
       this.dialogTitle = 'Редактирование задачи';
       this.currentTask = {
-        ...this.roomData.tasks
-          .filter((item: { name: string, description: string, id: number }) => item.id === id)[0],
+        ...this.tasks.filter((item: ITask) => item.id === id)[0],
       };
       this.taskFormVisible = true;
     },
@@ -121,26 +132,18 @@ export default defineComponent({
       };
       this.taskFormVisible = true;
     },
-    updateTaskData(data: { name: string, description: string, id: number}) {
-      this.taskFormVisible = false;
-      this.$emit('taskDataUpdate', data, this.roomData.id);
-      this.idForCreate += 1;
+    deleteTask(id: number) {
+      this.tasks = this.tasks.filter((task) => task.id !== id);
     },
-    createRoom() {
-      this.formDataRef.validate((valid: boolean | undefined) => {
-        if (valid) {
-          const roomData = {
-            name: this.form.name,
-            color: this.form.color,
-            id: this.roomData.id,
-          };
-          this.$emit('roomCreated', roomData);
-          this.formDataRef.resetFields();
-          this.$nextTick(() => {
-            this.formDataRef.clearValidate();
-          });
-        }
-      });
+    updateTaskData(data: ITask) {
+      this.taskFormVisible = false;
+
+      const currentTask = this.tasks.filter((task) => task.id === data.id)[0];
+      const taskIndex = this.tasks.indexOf(currentTask);
+      if (taskIndex === -1) {
+        this.tasks.push(data);
+        this.idForCreate += 1;
+      } else this.tasks[taskIndex] = data;
     },
   },
 
@@ -152,10 +155,11 @@ export default defineComponent({
     },
   },
 
-  mounted() {
+  created() {
     if (this.roomData) {
       this.form.name = this.roomData.name;
       this.form.color = this.roomData.color;
+      this.tasks = this.roomData.tasks;
     }
   },
 });

@@ -9,6 +9,7 @@
       </template>
       <el-col :span="6">
         <add-room  shadow="hover"
+                   :apartment="mainApartment.id"
                    :title="'Добавить комнату'"
                    :routerPath="'/room/create'"></add-room>
       </el-col>
@@ -48,13 +49,14 @@ export default defineComponent({
         total: 0,
       },
       mainApartment: {
-        id: Number,
-        name: String,
+        id: 0,
+        name: '',
         rooms: [{
-          id: Number,
-          name: String,
+          id: 0,
+          name: '',
+          color: '',
         }],
-        users: [],
+        users: [{ id: 0, name: '', email: '' }],
       },
     };
   },
@@ -72,6 +74,9 @@ export default defineComponent({
         });
         if (response.status !== 401) {
           this.apartmentsData = await response.json();
+          // const arr: { id: number, name: string,
+          //   rooms: {id: number, name: string, color: string}[],
+          //   users: {id: number, name: string, email: string}[] } = this.apartmentsData.items[0];
           this.mainApartment = this.apartmentsData.items[this.apartmentsData.items.length - 1];
         } else console.log('error');
         if (this.apartmentsData.items.length === 0) {

@@ -56,7 +56,7 @@ export default defineComponent({
       if (this.color) {
         return parseInt(this.color.slice(1), 16) > 0xAAAAAA
           ? 'color: #000000' : 'color: #FFFFFF';
-      } return '';
+      } return 'color: #000000';
     },
   },
 });
