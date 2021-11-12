@@ -31,7 +31,9 @@
   </el-row>
   <el-dialog v-model="taskFormVisible" :title="dialogTitle">
     <task-form :formData="currentTask"
-               @task-data-updated="updateTaskData"></task-form>
+               :allRoomsData="allRoomsData"
+               :currentRoomId="roomData.id"
+               @task-data-updated="$emit('updateTasks', $event)"></task-form>
   </el-dialog>
   <el-button @click="$emit('createRoom')">+</el-button>
 </template>
@@ -53,7 +55,8 @@ import CreateForm from '@/components/Task/CreateForm.vue';
 import AddComponent from '@/components/AddComponent.vue';
 
 interface ITask {
-  id: number,
+  rooms: number[],
+  id: string,
   name: string,
   description: string,
   points: number,
@@ -79,8 +82,9 @@ export default defineComponent({
       type: Object,
       required: true,
     },
+    allRoomsData: Object,
   },
-  emits: ['taskDataUpdate', 'deleteTask', 'roomCreated', 'createRoom'],
+  emits: ['taskDataUpdate', 'deleteTask', 'createRoom', 'updateTasks'],
 
   setup() {
     const formRef = ref<InstanceType<typeof ElForm>>();
@@ -93,6 +97,7 @@ export default defineComponent({
   data() {
     return {
       form: {
+        id: this.roomData.id,
         name: '',
         color: '',
       },
@@ -106,7 +111,7 @@ export default defineComponent({
       currentTask: {
         name: '',
         description: '',
-        id: 0,
+        id: '',
         points: 0,
       },
       idForCreate: 1,
@@ -115,7 +120,7 @@ export default defineComponent({
   },
 
   methods: {
-    openEditForm(id: number) {
+    openEditForm(id: string) {
       this.dialogTitle = 'Редактирование задачи';
       this.currentTask = {
         ...this.tasks.filter((item: ITask) => item.id === id)[0],
@@ -128,14 +133,15 @@ export default defineComponent({
         name: '',
         description: '',
         points: 0,
-        id: this.idForCreate,
+        id: this.idForCreate.toString(),
       };
       this.taskFormVisible = true;
     },
-    deleteTask(id: number) {
+    deleteTask(id: string) {
       this.tasks = this.tasks.filter((task) => task.id !== id);
     },
     updateTaskData(data: ITask) {
+      console.log('updating');
       this.taskFormVisible = false;
 
       const currentTask = this.tasks.filter((task) => task.id === data.id)[0];

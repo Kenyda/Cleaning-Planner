@@ -15,6 +15,8 @@
        </el-icon>
      </template>
     <create-room :roomData="room"
+                 @updateTasks="updateTasks"
+                 :allRoomsData="roomsData"
                  :ref="setRoomRefs"></create-room>
    </el-card>
    <el-button icon="el-icon-plus" @click="updateRoomData">Добавить комнату</el-button>
@@ -38,6 +40,14 @@ import {
 } from '@element-plus/icons';
 import CreateForm from '@/components/Room/CreateForm.vue';
 
+interface ITask {
+  rooms: number[],
+  id: string,
+  name: string,
+  description: string,
+  points: number,
+}
+
 export default defineComponent({
   name: 'CreateApartment',
   components: {
@@ -50,6 +60,7 @@ export default defineComponent({
     Delete,
     CreateRoom: CreateForm,
   },
+  emits: ['updateTasks'],
 
   setup() {
     const formRef = ref<InstanceType<typeof ElForm>>();
@@ -120,6 +131,13 @@ export default defineComponent({
 
       return this.formRef;
     },
+    roomsData(): {id: number, name: string}[] {
+      const data: {id: number, name: string}[] = [];
+      this.rooms.forEach((room) => data.push({
+        id: room.id, name: room.name,
+      }));
+      return data;
+    },
   },
 
   methods: {
@@ -142,6 +160,13 @@ export default defineComponent({
       const roomIndex = this.rooms.indexOf(currentRoom);
       this.rooms.splice(roomIndex, 1);
       this.roomRefs = [];
+    },
+
+    updateTasks(data: ITask) {
+      console.log(data);
+      this.roomRefs.forEach((room) => {
+        if (data.rooms.includes(room.form.id)) room.updateTaskData(data);
+      });
     },
 
     checkRoomData() {

@@ -20,6 +20,17 @@
                  show-stops> </el-slider>
     </div>
   </el-form-item>
+  <el-form-item prop="rooms">
+    <el-select v-model="form.rooms" multiple placeholder="Дополнительные комнаты">
+      <el-option
+        v-for="item in rooms"
+        :key="item.id"
+        :label="item.name"
+        :value="item.id"
+      >
+      </el-option>
+    </el-select>
+  </el-form-item>
   <el-form-item>
     <el-button @click="saveData">Сохранить</el-button>
   </el-form-item>
@@ -32,6 +43,8 @@ import {
   ElForm,
   ElFormItem,
   ElInput,
+  ElSelect,
+  ElOption,
   ElButton,
   ElSlider,
 } from 'element-plus';
@@ -42,11 +55,15 @@ export default defineComponent({
     ElForm,
     ElFormItem,
     ElInput,
+    ElSelect,
+    ElOption,
     ElButton,
     ElSlider,
   },
   props: {
+    allRoomsData: Object,
     formData: Object,
+    currentRoomId: Number,
   },
 
   emits: ['taskDataUpdated'],
@@ -61,6 +78,7 @@ export default defineComponent({
   data() {
     return {
       form: {
+        rooms: [] as number[],
         name: '',
         description: '',
       },
@@ -73,7 +91,7 @@ export default defineComponent({
           { max: 128, message: 'Значение не должно быть длиннее 128 символов', trigger: ['change', 'blur'] },
         ],
       },
-      id: 0,
+      id: '',
     };
   },
 
@@ -82,6 +100,12 @@ export default defineComponent({
       if (!this.formRef) throw new Error('No form ref!');
 
       return this.formRef;
+    },
+    rooms(): {id: number, name: string}[] {
+      if (this.currentRoomId && this.allRoomsData) {
+        return this.allRoomsData
+          .filter((room: { id: number, name: string }) => room.id !== this.currentRoomId);
+      } return [];
     },
   },
 
@@ -110,12 +134,15 @@ export default defineComponent({
 
   methods: {
     saveData() {
+      console.log('save');
       this.formDataRef.validate((valid: boolean | undefined) => {
         if (valid && this.formData) {
+          if (this.currentRoomId) this.form.rooms.push(this.currentRoomId);
           const taskData = {
+            rooms: this.form.rooms,
             name: this.form.name,
             description: this.form.description,
-            id: this.formData.id,
+            id: `${this.currentRoomId}.${this.formData.id}`,
             points: this.points,
           };
           this.$emit('taskDataUpdated', taskData);
