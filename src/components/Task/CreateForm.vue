@@ -20,12 +20,12 @@
                  show-stops> </el-slider>
     </div>
   </el-form-item>
-  <el-form-item prop="rooms">
+  <el-form-item prop="rooms" v-if="rooms.length > 0">
     <el-select v-model="form.rooms" multiple placeholder="Дополнительные комнаты">
       <el-option
         v-for="item in rooms"
         :key="item.id"
-        :label="item.name"
+        :label="item.name ? item.name : 'Комната без названия'"
         :value="item.id"
       >
       </el-option>
@@ -63,7 +63,11 @@ export default defineComponent({
   props: {
     allRoomsData: Object,
     formData: Object,
-    currentRoomId: Number,
+    currentRoomId: {
+      type: Number,
+      required: true,
+    },
+    isTaskEditing: Boolean,
   },
 
   emits: ['taskDataUpdated'],
@@ -102,52 +106,65 @@ export default defineComponent({
       return this.formRef;
     },
     rooms(): {id: number, name: string}[] {
-      if (this.currentRoomId && this.allRoomsData) {
+      if (this.allRoomsData) {
         return this.allRoomsData
           .filter((room: { id: number, name: string }) => room.id !== this.currentRoomId);
       } return [];
     },
   },
 
-  mounted() {
-    if (this.formData) {
-      this.form.name = this.formData.name;
-      this.form.description = this.formData.description;
-      this.id = this.formData.id;
-    }
-  },
+  mounted() { this.fillTheForm(); },
 
   updated() {
-    this.formDataRef.clearValidate();
+    this.fillTheForm();
+    if (!this.isTaskEditing) this.cleanForm();
   },
 
-  watch: {
-    formData: {
-      handler(val) {
-        this.form.name = val.name;
-        this.form.description = val.description;
-        this.id = val.id;
-        this.points = val.points;
-      },
-    },
-  },
+  // watch: {
+  //   formData: {
+  //     handler(val) {
+  //       this.form.name = val.name;
+  //       this.form.description = val.description;
+  //       this.id = val.id;
+  //       this.points = val.points;
+  //     },
+  //   },
+  // },
 
   methods: {
     saveData() {
-      console.log('save');
       this.formDataRef.validate((valid: boolean | undefined) => {
+        console.log('saveData');
         if (valid && this.formData) {
-          if (this.currentRoomId) this.form.rooms.push(this.currentRoomId);
+          let taskId = this.formData.id;
+          if (!this.isTaskEditing) {
+            taskId = `${this.currentRoomId}.${this.formData.id}`;
+          }
+          this.form.rooms.push(this.currentRoomId);
           const taskData = {
-            rooms: this.form.rooms,
-            name: this.form.name,
-            description: this.form.description,
-            id: `${this.currentRoomId}.${this.formData.id}`,
+            ...this.form,
             points: this.points,
+            id: taskId,
           };
           this.$emit('taskDataUpdated', taskData);
+          this.cleanForm();
         }
       });
+    },
+    cleanForm() {
+      this.formDataRef.resetFields();
+      this.points = 0;
+      this.form.rooms = [];
+      this.$nextTick(() => this.formDataRef.clearValidate());
+    },
+    fillTheForm() {
+      if (this.formData && this.isTaskEditing) {
+        this.form.name = this.formData.name;
+        this.form.description = this.formData.description;
+        this.form.rooms = this.formData.rooms.filter((room: number) => room !== this.currentRoomId);
+        this.id = this.formData.id;
+        this.points = this.formData.points;
+      }
     },
   },
 });

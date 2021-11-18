@@ -15,7 +15,9 @@
        </el-icon>
      </template>
     <create-room :roomData="room"
+                 :hideSaveButton="true"
                  @updateTasks="updateTasks"
+                 @deleteTask="deleteTask"
                  :allRoomsData="roomsData"
                  :ref="setRoomRefs"></create-room>
    </el-card>
@@ -39,14 +41,7 @@ import {
   Delete,
 } from '@element-plus/icons';
 import CreateForm from '@/components/Room/CreateForm.vue';
-
-interface ITask {
-  rooms: number[],
-  id: string,
-  name: string,
-  description: string,
-  points: number,
-}
+import { ITask } from '@/utils/types';
 
 export default defineComponent({
   name: 'CreateApartment',
@@ -72,22 +67,25 @@ export default defineComponent({
         id: -2,
         tasks: [
           {
-            name: 'Помыть посуду',
-            description: '12345 454 12345 454 12345 454 12345 454 12345 454 12345 454 12345 454 12345 454 12345 454 12345 454 12345 454 12345 454 12345678',
-            points: 3,
-            id: -2,
-          },
-          {
             name: 'Помыть пол',
             description: '',
             points: 5,
-            id: -3,
+            id: '-2',
+            rooms: [-2, -3],
+          },
+          {
+            name: 'Помыть посуду',
+            description: '',
+            points: 3,
+            id: '-3',
+            rooms: [-2],
           },
           {
             name: 'Помыть плиту',
             description: '',
             points: 5,
-            id: -4,
+            id: '-4',
+            rooms: [-2],
           },
         ],
       },
@@ -100,13 +98,16 @@ export default defineComponent({
             name: 'Помыть пол',
             description: '',
             points: 5,
-            id: -2,
+            id: '-2',
+            rooms: [-2, -3],
           },
         ],
       },
     ]);
 
-    return { rooms, formRef };
+    const tasks: ITask[] = reactive([]);
+
+    return { rooms, formRef, tasks };
   },
 
   data() {
@@ -133,8 +134,8 @@ export default defineComponent({
     },
     roomsData(): {id: number, name: string}[] {
       const data: {id: number, name: string}[] = [];
-      this.rooms.forEach((room) => data.push({
-        id: room.id, name: room.name,
+      this.roomRefs.forEach((room) => data.push({
+        id: room.form.id, name: room.form.name,
       }));
       return data;
     },
@@ -163,10 +164,19 @@ export default defineComponent({
     },
 
     updateTasks(data: ITask) {
+      console.log('updateTasks');
       console.log(data);
       this.roomRefs.forEach((room) => {
         if (data.rooms.includes(room.form.id)) room.updateTaskData(data);
+        else if (room.tasks.filter((task) => task.id === data.id).length > 0) {
+          room.deleteTask(data.id);
+        }
       });
+    },
+
+    deleteTask(id: string) {
+      console.log(id);
+      this.roomRefs.forEach((room) => room.deleteTask(id));
     },
 
     checkRoomData() {
@@ -193,14 +203,34 @@ export default defineComponent({
         const roomDataValid = this.checkRoomData();
         if (!valid) this.formDataRef.scrollToField('name');
         else if (roomDataValid) {
-          const apartmentData = await this.createApartment();
           this.roomRefs.forEach(async (room) => {
             if (room.form.name) {
-              const roomData = await this.createRoom(room.form, apartmentData.id);
               room.tasks.forEach(async (task) => {
-                await this.createTask(task, roomData.id, apartmentData.id);
+                if (!this.tasks.includes(task)) this.tasks.push(task);
               });
             }
+          });
+          const apartmentData = await this.createApartment();
+          const roomCreated = new Promise((resolve) => {
+            this.roomRefs.forEach(async (room) => {
+              if (room.form.name) {
+                const roomData = await this.createRoom(room.form, apartmentData.id);
+                this.tasks.forEach((task) => {
+                  const index = this.tasks.indexOf(task);
+                  const roomIndex = this.tasks[index].rooms.indexOf(room.form.id);
+                  if (task.rooms.includes(room.form.id)) {
+                    this.tasks[index].rooms[roomIndex] = roomData.id;
+                  }
+                });
+              }
+            });
+            resolve(this.tasks);
+          });
+          roomCreated.then(() => {
+            console.log('promise');
+            this.tasks.forEach(async (task) => {
+              await this.createTask(task, apartmentData.id);
+            });
           });
           this.$router.push('/');
         }
@@ -246,14 +276,10 @@ export default defineComponent({
       }
     },
 
-    async createTask(taskData: { name: string, description: string, points: number },
-      roomId: number,
-      apartmentId: number) {
+    async createTask(taskData: ITask, apartmentId: number) {
       const data = {
-        name: taskData.name,
-        description: taskData.description,
-        points: taskData.points,
-        rooms: [roomId],
+        ...taskData,
+        id: undefined,
         apartment: apartmentId,
       };
       try {

@@ -21,7 +21,7 @@
               v-for="task in tasks" :key="task.id">
         <task :taskData="task"
               :color="form.color"
-              @delete-task="deleteTask"
+              @delete-task="$emit('deleteTask', $event)"
               @edit-task="openEditForm"></task>
       </el-col>
     </template>
@@ -31,11 +31,13 @@
   </el-row>
   <el-dialog v-model="taskFormVisible" :title="dialogTitle">
     <task-form :formData="currentTask"
+               :isTaskEditing="isTaskEditing"
                :allRoomsData="allRoomsData"
                :currentRoomId="roomData.id"
                @task-data-updated="$emit('updateTasks', $event)"></task-form>
   </el-dialog>
-  <el-button @click="$emit('createRoom')">+</el-button>
+  <el-button v-if="!hideSaveButton"
+             @click="$emit('createRoom')">+</el-button>
 </template>
 
 <script lang="ts">
@@ -53,14 +55,7 @@ import {
 import Task from '@/components/Task/Task.vue';
 import CreateForm from '@/components/Task/CreateForm.vue';
 import AddComponent from '@/components/AddComponent.vue';
-
-interface ITask {
-  rooms: number[],
-  id: string,
-  name: string,
-  description: string,
-  points: number,
-}
+import { ITask } from '@/utils/types';
 
 export default defineComponent({
   name: 'RoomCreateForm',
@@ -83,6 +78,7 @@ export default defineComponent({
       required: true,
     },
     allRoomsData: Object,
+    hideSaveButton: Boolean,
   },
   emits: ['taskDataUpdate', 'deleteTask', 'createRoom', 'updateTasks'],
 
@@ -109,47 +105,60 @@ export default defineComponent({
       },
       taskFormVisible: false,
       currentTask: {
+        rooms: [] as number[],
         name: '',
         description: '',
         id: '',
         points: 0,
       },
       idForCreate: 1,
+      isTaskEditing: false,
       dialogTitle: '',
     };
   },
 
   methods: {
     openEditForm(id: string) {
+      console.log('openEditForm');
       this.dialogTitle = 'Редактирование задачи';
       this.currentTask = {
         ...this.tasks.filter((item: ITask) => item.id === id)[0],
       };
+      console.log(this.currentTask);
+      this.isTaskEditing = true;
       this.taskFormVisible = true;
     },
     openAddForm() {
+      console.log('open');
       this.dialogTitle = 'Добавление задачи';
       this.currentTask = {
+        rooms: [],
         name: '',
         description: '',
         points: 0,
         id: this.idForCreate.toString(),
       };
+      this.isTaskEditing = false;
       this.taskFormVisible = true;
     },
-    deleteTask(id: string) {
-      this.tasks = this.tasks.filter((task) => task.id !== id);
-    },
     updateTaskData(data: ITask) {
-      console.log('updating');
+      console.log('updateTaskData');
       this.taskFormVisible = false;
 
       const currentTask = this.tasks.filter((task) => task.id === data.id)[0];
-      const taskIndex = this.tasks.indexOf(currentTask);
-      if (taskIndex === -1) {
+      const index = this.tasks.indexOf(currentTask);
+      this.tasks[index] = data;
+      if (index === -1) {
         this.tasks.push(data);
         this.idForCreate += 1;
-      } else this.tasks[taskIndex] = data;
+      } else this.tasks[index] = data;
+    },
+    deleteTask(id: string) {
+      const currentTask = this.tasks.filter((task) => task.id === id)[0];
+      if (currentTask !== undefined) {
+        const taskIndex = this.tasks.indexOf(currentTask);
+        this.tasks.splice(taskIndex, 1);
+      }
     },
   },
 
